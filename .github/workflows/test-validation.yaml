@@ -1,0 +1,144 @@
+name: Test C Code Submission
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  test-submission:
+    runs-on: ubuntu-latest
+
+    # Only run this workflow for issues with the 'submission' label
+    if: contains(github.event.issue.labels.*.name, 'submission')
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Extract C code from issue body
+        id: extract-code
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const issueBody = context.payload.issue.body;
+
+            // Look for code blocks in the markdown
+            const codeRegex = /```c\s*([\s\S]*?)\s*```/g;
+            const match = codeRegex.exec(issueBody);
+
+            if (!match) {
+              core.setFailed('No C code found in issue body');
+              return;
+            }
+
+            const code = match[1];
+
+            // Save the code to a file
+            const fs = require('fs');
+            fs.writeFileSync('p1.c', code);
+
+            return code;
+
+      - name: Setup C compiler
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gcc
+
+      - name: Compile submission
+        id: compile
+        run: |
+          gcc -o p1 p1.c
+          echo "Compilation successful"
+        continue-on-error: true
+
+      - name: Run tests
+        id: run-tests
+        if: steps.compile.outcome == 'success'
+        run: |
+          mkdir -p test_results
+
+          # Run each test case
+          for test_dir in tests/*/; do
+            test_name=$(basename "$test_dir")
+            echo "Running test: $test_name"
+            
+            # Copy the input file to the expected location
+            cp "${test_dir}input.txt" input.txt
+            
+            # Run the program
+            ./p1
+            
+            # Check if output.txt was created
+            if [ ! -f output.txt ]; then
+              echo "::error::Test $test_name failed: No output.txt file was created"
+              echo "FAIL" > "test_results/${test_name}.result"
+              continue
+            fi
+            
+            # Compare with expected output
+            diff -q output.txt "${test_dir}expected_output.txt" > /dev/null
+            if [ $? -eq 0 ]; then
+              echo "Test $test_name: PASS"
+              echo "PASS" > "test_results/${test_name}.result"
+            else
+              echo "::error::Test $test_name failed: Output doesn't match expected result"
+              echo "FAIL" > "test_results/${test_name}.result"
+            fi
+            
+            # Clean up for next test
+            rm input.txt output.txt
+          done
+
+      - name: Post test results
+        if: always()
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            let resultMessage = '';
+
+            // If compilation failed
+            if ('${{ steps.compile.outcome }}' !== 'success') {
+              resultMessage = '## ❌ Compilation Failed\n\nYour code failed to compile. Please check your syntax and try again.';
+            } else {
+              // Process test results
+              resultMessage = '## Test Results\n\n';
+              
+              const testResultsDir = 'test_results';
+              
+              if (fs.existsSync(testResultsDir)) {
+                const files = fs.readdirSync(testResultsDir);
+                
+                let passCount = 0;
+                let totalCount = 0;
+                
+                files.forEach(file => {
+                  if (file.endsWith('.result')) {
+                    const testName = file.replace('.result', '');
+                    const result = fs.readFileSync(path.join(testResultsDir, file), 'utf8').trim();
+                    
+                    totalCount++;
+                    if (result === 'PASS') {
+                      passCount++;
+                      resultMessage += `- ✅ Test ${testName}: **PASS**\n`;
+                    } else {
+                      resultMessage += `- ❌ Test ${testName}: **FAIL**\n`;
+                    }
+                  }
+                });
+                
+                resultMessage += `\n### Summary: ${passCount}/${totalCount} tests passed`;
+              } else {
+                resultMessage += 'No test results found.';
+              }
+            }
+
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: resultMessage
+            });
