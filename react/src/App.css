@@ -1,0 +1,171 @@
+/* Basic spacing */
+.p-4 {
+  padding: 1rem;
+}
+.p-2 {
+  padding: 0.5rem;
+}
+.p-1 {
+  padding: 0.25rem;
+}
+.p-3 {
+  padding: 0.75rem;
+}
+
+.pb-1 {
+  padding-bottom: 0.25rem;
+}
+.pl-6 {
+  padding-left: 1.5rem;
+}
+
+.mb-6 {
+  margin-bottom: 1.5rem;
+}
+.mb-4 {
+  margin-bottom: 1rem;
+}
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+.mb-1 {
+  margin-bottom: 0.25rem;
+}
+.mr-4 {
+  margin-right: 1rem;
+}
+.mr-2 {
+  margin-right: 0.5rem;
+}
+.mt-6 {
+  margin-top: 1.5rem;
+}
+.mt-4 {
+  margin-top: 1rem;
+}
+.ml-4 {
+  margin-left: 1rem;
+}
+
+/* Typography */
+.text-2xl {
+  font-size: 1.5rem;
+}
+.text-xl {
+  font-size: 1.25rem;
+}
+.text-sm {
+  font-size: 0.875rem;
+}
+.font-bold {
+  font-weight: 700;
+}
+
+/* Colors */
+.bg-blue-500 {
+  background-color: #3b82f6;
+}
+.bg-green-500 {
+  background-color: #22c55e;
+}
+.bg-red-500 {
+  background-color: #b81d1d;
+}
+.bg-gray-100 {
+  background-color: #f3f4f6;
+}
+.bg-gray-300 {
+  background-color: #d1d5db;
+}
+.text-white {
+  color: #ffffff;
+}
+.text-gray-700 {
+  color: #374151;
+}
+.text-gray-500 {
+  color: #6b7280;
+}
+.text-red-500 {
+  color: #b81d1d;
+}
+.hover\:text-red-500:hover {
+  color: #b81d1d;
+}
+.border-red-500 {
+  border-color: #b81d1d;
+}
+
+/* Layout */
+.flex {
+  display: flex;
+}
+.flex-grow {
+  flex-grow: 1;
+}
+.items-end {
+  align-items: flex-end;
+}
+.items-center {
+  align-items: center;
+}
+.justify-between {
+  justify-content: space-between;
+}
+.w-full {
+  width: 100%;
+}
+.w-one-third {
+  width: 33.333333%;
+}
+.w-two-thirds {
+  width: 66.666667%;
+}
+.h-64 {
+  height: 16rem;
+}
+.border {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e5e7eb;
+}
+.border-b {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  border-bottom-color: #e5e7eb;
+}
+.max-w-4xl {
+  max-width: 56rem;
+}
+
+/* Other */
+.overflow-auto {
+  overflow: auto;
+}
+.list-disc {
+  list-style-type: disc;
+}
+.block {
+  display: block;
+}
+
+/* Spacing and border for tables */
+table.w-full {
+  width: 100%;
+}
+
+th.border,
+td.border {
+  border-width: 1px;
+  border-style: solid;
+  border-color: #e5e7eb;
+}
+
+th.p-1,
+td.p-1 {
+  padding: 0.25rem;
+}
+
+th.text-left {
+  text-align: left;
+}
